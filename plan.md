@@ -18,10 +18,13 @@ Stop at the end of every milestone, show what was done, and wait for approval be
 6. If something in this plan is ambiguous or seems wrong, stop and ask rather than guessing.
 7. Run `forge fmt` before suggesting any commit that touches Solidity. The repo's GitHub CI runs `forge fmt --check` and fails on unformatted code.
 8. Respect the schedule below. If a milestone runs over its end time, say so and propose what to cut (see "Cut order").
+9. **Never write to plan.md.** Only Kai and Claude edit it. Always re-read it from disk; never save a cached copy over it.
 
 ---
 
 ## Schedule (hard stop 17:45)
+
+Status: Milestones 1 to 3 done by 14:22 (contract and 16 tests reviewed and re-run externally, approved).
 
 | Milestone | Ends by |
 |---|---|
@@ -131,7 +134,7 @@ Remove the template's `Counter` contract, test and script in Milestone 2 once `S
    ```
    The template's broadcast rules can stay: broadcast logs contain transactions and addresses, never private keys.
 2. Create `.env.example` and `.streamlit/secrets.toml.example` listing variable names only:
-   `RPC_URL`, `CHAIN_ID`, `CONTRACT_ADDRESS`, `ORACLE_ADDRESS`, `ORACLE_PRIVATE_KEY`, `ORACLE_PANEL_PASSWORD`, `PLAYER_KAI_KEY`, `PLAYER_ALICE_KEY`, `PLAYER_BOB_KEY`.
+   `RPC_URL`, `CHAIN_ID` (a number, e.g. `10143`, not a string), `CONTRACT_ADDRESS`, `ORACLE_ADDRESS`, `ORACLE_PRIVATE_KEY`, `ORACLE_PANEL_PASSWORD`, `PLAYER_KAI_KEY`, `PLAYER_ALICE_KEY`, `PLAYER_BOB_KEY`.
    Add a comment at the top: "All of these wallets are throwaway testnet wallets. Never put the deployer/owner key here."
 3. Stub `README.md` (title, one-line description, "setup coming").
 
@@ -234,6 +237,7 @@ jq '.abi' out/SleepStake.sol/SleepStake.json > app/abi/SleepStake.json
 (If `jq` is missing: `brew install jq`.)
 
 Also print a ready-to-run `cast send` command for creating the demo challenge (2 nights, small buy-in such as 0.01 MON, `firstNightStart` = 21:00 Europe/Berlin two nights ago, `joinDeadline` = a few hours from now) as the fallback if the Create page is cut. Explain how the timestamp was computed.
+**Important:** `settle` becomes callable by anyone once `firstNightStart + nights * 1 days` has passed. For the demo, choose values so that moment is still in the future (recommended: `firstNightStart` = 21:00 on 24 Sept = `1790276400`, `nights = 2`. Both nights are real past nights, and the time unlock is 26 Sept 21:00, after the demo. Settle still works earlier once every report is in). Otherwise any visitor to the public app could settle before any reports and everyone just gets refunded.
 
 For local practice without tokens: `anvil` in one terminal, then the same script with `--rpc-url http://127.0.0.1:8545` and an anvil test key.
 
@@ -256,6 +260,7 @@ For local practice without tokens: `anvil` in one terminal, then the same script
 - Connect with web3.py; show a clear error if the RPC is unreachable or the chain ID is wrong.
 - Load the contract from `abi/SleepStake.json` and `CONTRACT_ADDRESS`.
 - `send_tx(account_key, fn)`: build, sign, send, wait for the receipt. Return tx hash and explorer link. Never log or display a private key.
+  Monad charges gas based on the transaction's **gas limit**, not the gas actually used, so set the gas limit from `estimate_gas` plus a small buffer (about 20%). Never hardcode a huge gas limit.
 - Cache read calls with `st.cache_data(ttl=5)` to avoid spamming the RPC. Clear the cache after each successful transaction.
 
 ### `app/streamlit_app.py` (pages via sidebar radio or tabs)
