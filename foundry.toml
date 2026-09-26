@@ -2,6 +2,7 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+network="monad"
 metadata = true
 metadata_hash = "none"  # disable ipfs
 use_literal_content = true # use source code
