@@ -73,7 +73,7 @@ flowchart TD
 
 ## Live Demo
 
-- **Streamlit App**: https://sleepstake-intjg3laogz4rind9anvsp.streamlit.app
+- **Streamlit App**: LIVE_URL_HERE
 
 ---
 
